@@ -1,0 +1,32 @@
+<div class="product-test page-width">
+    <div class="product-test__wrapper">
+        {{ product }}
+    </div>
+</div>
+
+{% schema %}
+    {
+      "name": "Product test",
+      "tag": "section",
+      "class": "section",
+      "disabled_on": {
+        "groups": ["header", "footer"]
+      },
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        }
+      ],
+      "blocks": [
+      ],
+      "presets": [
+        {
+          "name": "Product test",
+          "blocks": [
+          ]
+        }
+      ]
+    }
+    {% endschema %}
