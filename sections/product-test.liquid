@@ -1,6 +1,78 @@
 <div class="product-test page-width">
     <div class="product-test__wrapper">
-        {{ product }}
+        <h1 class="product-test__title">{{ product.title }}</h1>
+        <div class="product-test__image">
+            {%- for media in product.media -%}
+                {%- if media.media_type == 'image' -%}
+                    {{ media | image_url: width: 400, crop: 'center' | image_tag }}
+                {%- elsif media.media_type == 'video' -%}
+                    {{ media | video_tag: image_size: '400x', width: 400, autoplay: false, loop: true, muted: true, controls: true }}
+                {%- elsif media.media_type == 'external_video' -%}
+                    {%- if media.host == 'youtube' -%}
+                        {{ media | external_video_url: color: 'white' | external_video_tag }}
+                      {%- elsif media.host == 'vimeo' -%}
+                        {{ media | external_video_url: loop: '1', muted: '1' | external_video_tag }}
+                      {%- endif -%}
+                {%-  elsif media.media_type == 'model' -%}
+                        {{ media | model_viewer_tag: interaction-policy: 'allow-when-focused', image_size: '400x' }}
+                {%- endif -%}
+            {%- endfor -%}
+        </div>
+
+        <p class="product-test__name metaobjects-name">
+            {{ shop.metaobjects['creator']['tatiana'].name }}
+        </p>
+        <ul class="product-test__list metaobjects-list">
+            {% for creator in shop.metaobjects['creator'].values %}
+                <li class="metaobjects-list__item">{{ creator.name }}</li>
+            {% endfor %}
+            <p class="metaobjects-list__count">{{ shop.metaobjects['creator'].values_count }}</p>
+        </ul>
+
+        <a class="product-test__link metaobjects-link" href="{{ shop.metaobjects['creator']['tatiana'].system.url }}">
+            {{ shop.metaobjects['creator']['tatiana'].system.handle }}
+        </a>
+
+        <p class="product-test__metafields metafields">
+            {{ product.metafields.custom.icon_color_as_a_number }}
+        </p>
+
+        <p class="product-test__metafields metafields-creators">
+            {{ product.metafields.custom.creators.value }}
+        </p>
+
+        <ul class="product-test__list metafields-list">
+            {%- for creator in product.metafields.custom.creators.value -%}
+                <li class="metafields-list__item">
+                    {{ creator.name }}
+                </li>
+            {%- endfor -%}
+        </ul>
+
+        <p class="product-test__metafields metafields-tag">
+            {{ product.metafields.custom.icon_color_as_a_number | metafield_tag }}
+        </p>
+
+        <p class="product-test__metaobjects metafields-tag">
+            {{ shop.metaobjects['creator']['tatiana'].photo | metafield_tag }}
+        </p>
+
+        <p class="product-test__metaobjects metafields-tag">
+            {{ product.metafields.custom.creators | metafield_text: field: 'name' }}
+        </p>
+
+        <div class="product-test__logo">
+            {{ shop.brand.logo | image_url: width: 200, crop: 'center' | image_tag }}
+        </div>
+
+        <div class="product-test__color" style="background-color: {{ shop.brand.colors.primary[0].background }}; color: {{ shop.brand.colors.primary[0].foreground }};">
+            Lorem ipsum dolor sit amet.
+        </div>
+
+        <div class="product-test__snippet">
+            {% render 'test-snippet', text: section.settings.text %}
+        </div>
+
     </div>
 </div>
 
@@ -14,9 +86,10 @@
       },
       "settings": [
         {
-          "type": "product",
-          "id": "product",
-          "label": "Product"
+        "type": "text",
+        "id": "text",
+        "label": "Text",
+        "default": "Simple text"
         }
       ],
       "blocks": [
