@@ -25,7 +25,11 @@
 
 .header__menu {}
 
-.header__icons {}
+.header__icons {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
 
 .header__cart {}
 

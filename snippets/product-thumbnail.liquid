@@ -1,0 +1,13 @@
+{% if product.media.size > 1 %}
+  <div class="thumbnails-wrapper">
+    {% for media in product.media %}
+      <a data-thumbnail-id="{{ media.id }}">
+        {{
+          media.preview_image
+          | image_url: width: 110, height: 110
+          | image_tag: class: 'product-single__thumbnail-image', loading: 'lazy'
+        }}
+      </a>
+    {% endfor %}
+  </div>
+{% endif %}

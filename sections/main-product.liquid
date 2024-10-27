@@ -1,0 +1,197 @@
+{{ 'main-product.css' | asset_url | stylesheet_tag }}
+
+{% assign current_variant = product.selected_or_first_available_variant %}
+{% assign featured_media = current_variant.featured_media %}
+{% if featured_media == blank %}
+  {% assign featured_media = product.media.first %}
+{% endif %}
+{% assign variant_images = product.images | where: 'attached_to_variant?', true | map: 'src' %}
+
+{% comment %} For testing purposes {% endcomment %}
+<span class="product_options_size" style="display: none;">{{ product.options.size }}</span>
+
+<section class="main-product" id="product-section" data-section-id="{{ section.id }}">
+  <div class="container">
+    <div class="main-product__wrapper" data-product-url="{{ product.url }}">
+      <div class="main-product__media">
+        {%- if featured_media -%}
+          {% render 'product-media',
+            media: featured_media,
+            current_variant: current_variant,
+            featured_media: featured_media,
+            variant_images: variant_images,
+            is_main: true
+          %}
+        {%- else -%}
+          <!-- Fallback in case there's no media -->
+          <div class="product-single__media">
+            <p>No media available for this product.</p>
+          </div>
+        {%- endif -%}
+
+        <!-- Thumbnails Section -->
+        <div class="product-thumbnails">
+          {%- for media in product.media -%}
+            <span class="media_id" style="display: none;">{{ media.id }}</span>
+            {% if media.id != featured_media.id %}
+              {% render 'product-media',
+                media: media,
+                current_variant: current_variant,
+                featured_media: featured_media,
+                variant_images: variant_images,
+                is_main: false
+              %}
+            {% endif %}
+          {%- endfor -%}
+        </div>
+      </div>
+
+      <div class="main-product__content product-content">
+        <p class="product-content__vendor">{{ product.vendor }}</p>
+        <h2 class="product-content__title">{{ product.title | escape }}</h2>
+
+        {% form 'product', product, class: 'product-content__form product-form' %}
+          <input type="hidden" name="id" value="{{ current_variant.id }}">
+
+          <!-- Product price -->
+          <div class="product-form__price">
+            <span class="product-form__price-reg">{{ current_variant.price | money }}</span>
+
+            {% if current_variant.compare_at_price > current_variant.price %}
+              <span class="product-form__price-sale">
+                <s>{{ current_variant.compare_at_price | money }}</s>
+              </span>
+            {% endif %}
+          </div>
+
+          <div class="main-product__option-value-selectors">
+            <!-- Loop through each product option (e.g., Color, Finish, Upholstery) -->
+            {% for option in product.options_with_values %}
+              <fieldset class="product-option">
+                <legend>{{ option.name }}</legend>
+
+                <!-- Display each option value as a list of radio buttons -->
+                <ul>
+                  {% for option_value in option.values %}
+                    {%- capture input_id -%}
+                    {{ section.id }}-{{ option.position }}-{{ forloop.index0 -}}
+                  {%- endcapture -%}
+
+                    <li>
+                      <input
+                        type="radio"
+                        id="{{ input_id }}"
+                        name="{{ option.name }}"
+                        value="{{ option_value | escape }}"
+                        {% if option_value.selected %}
+                          checked
+                        {% endif %}
+                        {% unless option_value.variant.available %}
+                          class="disabled"
+                        {% endunless %}
+                        data-product-url="{{ option_value.product_url }}"
+                        data-variant-id="{{ option_value.variant.id }}"
+                        data-option-value-id="{{ option_value.id }}"
+                      >
+                      <label for="{{ input_id }}">
+                        {{ option_value -}}
+                      </label>
+
+                      <!--
+                        The variant associated with the option value in combination with the other selected option values
+                      -->
+                      <script type="application/json">
+                        {{ option_value.variant | json }}
+                      </script>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </fieldset>
+            {% endfor %}
+          </div>
+
+          <!-- Display the price of the currently selected variant -->
+          <div class="product-variant-price">
+            <span>{{ current_variant.price | money }}</span>
+          </div>
+
+          <input type="text" name="quantity" min="1" value="1">
+
+          <input type="submit" value="Add to cart">
+          {{ form | payment_button }}
+        {% endform %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% javascript %}
+  function onVariantChange({ target: optionValueElement }) {
+    const productElement = this.querySelector('.main-product__wrapper');
+    const sectionId = this.dataset.sectionId;
+    const oldProductUrl = productElement.dataset.productUrl;
+    const newProductUrl = optionValueElement.dataset.productUrl;
+    const newVariantId = optionValueElement.dataset.variantId;
+
+    // Update the hidden input field with the new variant ID
+    const variantInput = this.querySelector('input[name="id"]');
+    variantInput.value = newVariantId;
+
+    // Update the deep link in the URL, only if necessary
+    if (newVariantId !== '') {
+      const newUrl = `${newProductUrl}${newVariantId ? `?variant=${newVariantId}` : ''}`;
+      window.history.replaceState({}, '', newUrl);
+    }
+
+    let params = `section_id=${sectionId}&`;
+    if (newVariantId) {
+      // If the option value has a variant selection, call the section rendering API for that variant
+      params += `variant=${newVariantId}`;
+    } else {
+      // If the option value selection has no variant, call the section rendering API with the selected option value IDs instead
+      const selectedOptionIds = Array.from(this.querySelectorAll('fieldset input:checked'))
+        .map((element) => element.dataset.optionValueId)
+        .join(',');
+      params += `option_values=${selectedOptionIds}`;
+    }
+
+    // Call the section rendering API
+    fetch(`${newProductUrl}?${params}`)
+      .then((response) => response.text())
+      .then((responseText) => {
+        const html = new DOMParser().parseFromString(responseText, 'text/html');
+
+        const hasVariant = !!newVariantId; // Check if a valid variant exists
+
+        if (newProductUrl && oldProductUrl !== newProductUrl) {
+          // If the product changed, replace the old product section with the new product section
+          productElement.parentNode.insertBefore(html.querySelector('.main-product__wrapper'), productElement);
+          productElement.remove();
+
+          // Focus the input for the last clicked option value
+          this.querySelector(`#${optionValueElement.id}`).focus();
+
+          // Update anything else that depends on product, such as URL and recommended products
+          return;
+        }
+
+        // Update the product options and price on the page
+        this.querySelector('.main-product__option-value-selectors').innerHTML = html.querySelector(
+          '.main-product__option-value-selectors'
+        ).innerHTML;
+        this.querySelector(`#${optionValueElement.id}`).focus();
+
+        const priceEl = this.querySelector('.product-form__price');
+        if (hasVariant) {
+          priceEl.innerHTML = html.querySelector('.product-form__price').innerHTML;
+          // Update any additional states here
+        } else {
+          priceEl.innerHTML = '';
+          // Set additional unavailable states here
+        }
+      });
+  }
+
+  // Add event listener to handle variant change
+  document.getElementById('product-section').addEventListener('change', onVariantChange);
+{% endjavascript %}

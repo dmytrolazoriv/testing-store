@@ -1,0 +1,83 @@
+.cart {}
+
+.cart__wrapper {}
+
+.cart__contents {}
+
+.cart__item {}
+
+.cart__item:not(:last-child) {
+  margin-bottom: 40px;
+}
+
+.cart__price {}
+
+.cart__options {}
+
+.cart__properties {}
+
+.cart__quantity {}
+
+.cart__additional {}
+
+.cart__footer {}
+
+.container {}
+
+.critical-hidden {}
+
+.item {}
+
+.item_test {}
+
+.cart-price {}
+
+.cart-price__final-price {}
+
+.cart-price__original-price {}
+
+.cart-price__discounts {}
+
+.discounts {}
+
+.discounts__list {}
+
+.discounts__item {}
+
+.discounts__title {}
+
+.cart-options {}
+
+.cart-options__name {}
+
+.cart-options__value {}
+
+.cart-properties {}
+
+.cart-properties__property {}
+
+.cart-properties__link {}
+
+.cart-properties__text {}
+
+.cart-quantity {}
+
+.cart-quantity__update {}
+
+.cart-quantity__submit {}
+
+.cart-quantity__remove {}
+
+.cart-additional {}
+
+.cart-additional__note {}
+
+.cart-additional__attributes {}
+
+.cart-footer {}
+
+.cart-footer__discounts {}
+
+.cart-footer__total-price {}
+
+.cart-footer__checkout {}

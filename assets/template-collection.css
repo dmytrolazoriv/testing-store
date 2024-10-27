@@ -1,0 +1,47 @@
+.collection {}
+
+.collection__container {}
+
+.collection__grid {}
+
+.gradient {}
+
+.grid {
+  display: grid;
+}
+
+.grid__item {}
+
+
+
+.grid-2__col-mobile {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.grid-1__col-mobile {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+@media screen and (min-width: 576px) {
+  .grid-3__col-tablet {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .grid-2__col-tablet {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .grid-4__col-desktop {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .grid-5__col-desktop {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .grid-6__col-desktop {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}

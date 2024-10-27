@@ -1,19 +1,54 @@
 {{ 'product-card.css' | asset_url | stylesheet_tag }}
 
 <div class="product-card__wrapper">
-    <a href="{{ product.url }}" class="product-card__link">
-        {{ product | image_url: height: 400 | image_tag }}
-    </a>
-    <h3 class="product-card__title">{{ product.title }}</h3>
-    <p class="product-card__price">
-        {{ product.price | money_without_trailing_zeros }}
+  <a href="{{ product.url }}" class="product-card__link"></a>
+  <div class="product-card__image">
+    {%- for media in product.media -%}
+      {% render 'product-media',
+        media: media,
+        current_variant: current_variant,
+        featured_media: featured_media,
+        variant_images: variant_images,
+        is_main: forloop.first
+      %}
+    {%- endfor -%}
+  </div>
+  <h3 class="product-card__title">{{ product.title }}</h3>
+  <p class="product-card__price">
+    {{ product.price | money_without_trailing_zeros }}
+  </p>
+  <s class="product-card__compare">
+    {{ product.compare_at_price | money_without_trailing_zeros }}
+  </s>
+  {%- if show_vendor -%}
+    <p class="product-card__vendor">
+      {{ product.vendor }}
     </p>
-    <p class="product-card__compare">
-        {{ product.compare_at_price | money_without_trailing_zeros }}
-    </p>
-    {% if show_vendor %}
-        <p class="product-card__vendor">
-            {{ product.vendor }}
-        </p>
-    {% endif %}
+    <span class="visually-hidden">{{ product.vendor }}</span>
+  {%- endif -%}
+  {% if product.options.size > 1 %}
+    <a href="{{ product.url }}" class="product-card__link_internal">Choose options</a>
+  {% else %}
+    {% form 'product', product, class: 'product-form' %}
+      <!-- form content start -->
+      <input
+        type="hidden"
+        name="id"
+        value="{{ product.selected_or_first_available_variant.id }}"
+        class="product-variant-id"
+        {% if product.selected_or_first_available_variant.available == false %}
+          disabled
+        {% endif %}
+      >
+      <input type="text" name="quantity" min="1" value="1" hidden>
+      <input type="text" name="properties[Test]" hidden>
+      <input type="submit" value="Add to cart">
+
+      {% comment %} accelerated checkout button {% endcomment %}
+      {%- if accelerated_checkout_button -%}
+        {{ form | payment_button }}
+      {%- endif -%}
+      <!-- form content end -->
+    {% endform %}
+  {% endif %}
 </div>

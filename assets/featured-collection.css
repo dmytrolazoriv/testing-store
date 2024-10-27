@@ -14,7 +14,6 @@
 }
 
 .featured-collection__item {
-    padding: 1rem;
     border: 0.1rem solid rgba(var(--color-foreground), 0.5);
     transition: all 0.3s ease 0s;
 }

@@ -2,8 +2,7 @@
 
 <noscript>{{ 'header.css' | asset_url | stylesheet_tag }}</noscript>
 
-<style>
-</style>
+<style></style>
 
 {%- style -%}
 {%- endstyle -%}
@@ -19,20 +18,22 @@
 -%}
 
 <header class="header">
-
-<div class="header__container container">
-  <div class="header__info">
-    {%- if request.page_type == 'index' -%}
-      <h1 class="header__heading">
-    {%- endif -%}
-        <a href="{{ routes.root_url }}" class="header__heading-link">
-          {%- if section.settings.logo != blank -%}
-            <div class="header__heading-logo-wrapper">
-              {%- assign logo_alt = section.settings.logo.alt | default: shop.name | escape -%}
-              {%- assign logo_height = section.settings.logo_width | divided_by: settings.logo.aspect_ratio -%}
-              {% capture sizes %}(max-width: {{ settings.logo_width | times: 2 }}px) 50vw, {{ settings.logo_width }}px{% endcapture %}
-              {% capture widths %}{{ section.settings.logo_width }}, {{ section.settings.logo_width | times: 1.5 | round }}, {{ section.settings.logo_width | times: 2 }}{% endcapture %}
-              {{ section.settings.logo | image_url: width: 600 | image_tag:
+  <div class="header__container container">
+    <div class="header__info">
+      {%- if request.page_type == 'index' -%}
+        <h1 class="header__heading">
+      {%- endif -%}
+      <a href="{{ routes.root_url }}" class="header__heading-link">
+        {%- if section.settings.logo != blank -%}
+          <div class="header__heading-logo-wrapper">
+            {%- assign logo_alt = section.settings.logo.alt | default: shop.name | escape -%}
+            {%- assign logo_height = section.settings.logo_width | divided_by: settings.logo.aspect_ratio -%}
+            {% capture sizes %}(max-width: {{ settings.logo_width | times: 2 }}px) 50vw, {{ settings.logo_width }}px{% endcapture %}
+            {% capture widths %}{{ section.settings.logo_width }}, {{ section.settings.logo_width | times: 1.5 | round }}, {{ section.settings.logo_width | times: 2 }}{% endcapture %}
+            {{
+              section.settings.logo
+              | image_url: width: 600
+              | image_tag:
                 class: 'header__heading-logo motion-reduce',
                 widths: widths,
                 height: logo_height,
@@ -40,46 +41,47 @@
                 alt: logo_alt,
                 sizes: sizes,
                 preload: true
-              }}
-            </div>
-          {%- else -%}
-            <span class="h2">{{ shop.name }}</span>
-          {%- endif -%}
-        </a>
-    {%- if request.page_type == 'index' -%}
-      </h1>
-    {%- endif -%}
-  
-    <ul class="header__menu menu-header">
-      {% for link in section.settings.menu.links %}
-        <li class="menu-header__item">
-          <a href="{{ link.url }}">{{ link.title }}</a>
-    
-          {% if link.links.size > 0 %}
-            <ul class="menu-header__item  item-child">
-              {% for child_link in link.links %}
-                <li class="item-child__link">
-                  <a href="{{ child_link.url }}">{{ child_link.title }}</a>
-    
-                  {% if child_link.links.size > 0 %}
-                    <ul class="item-child__link dropdown-grandchild">
-                      {% for grandchild_link in child_link.links %}
-                        <li class="dropdown-grandchild__link">
-                          <a href="{{ grandchild_link.url }}">{{ grandchild_link.title }}</a>
-                        </li>
-                      {% endfor %}
-                    </ul>
-                  {% endif %}
-                </li>
-              {% endfor %}
-            </ul>
-          {% endif %}
-        </li>
-      {% endfor %}
-    </ul>
-  </div>
-  
+            }}
+          </div>
+        {%- else -%}
+          <span class="h2">{{ shop.name }}</span>
+        {%- endif -%}
+      </a>
+      {%- if request.page_type == 'index' -%}
+        </h1>
+      {%- endif -%}
+
+      <ul class="header__menu menu-header">
+        {% for link in section.settings.menu.links %}
+          <li class="menu-header__item">
+            <a href="{{ link.url }}">{{ link.title }}</a>
+
+            {% if link.links.size > 0 %}
+              <ul class="menu-header__item  item-child">
+                {% for child_link in link.links %}
+                  <li class="item-child__link">
+                    <a href="{{ child_link.url }}">{{ child_link.title }}</a>
+
+                    {% if child_link.links.size > 0 %}
+                      <ul class="item-child__link dropdown-grandchild">
+                        {% for grandchild_link in child_link.links %}
+                          <li class="dropdown-grandchild__link">
+                            <a href="{{ grandchild_link.url }}">{{ grandchild_link.title }}</a>
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    {% endif %}
+                  </li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+
     <div class="header__icons">
+      {% render 'header-search' %}
       <a href="{{ routes.cart_url }}" class="header__cart">
         {%- liquid
           if cart == empty
@@ -99,15 +101,13 @@
         {%- endif -%}
       </a>
     </div>
-</div>
-
+  </div>
 </header>
 
 {% javascript %}
 {% endjavascript %}
 
-<script type="application/ld+json">
-</script>
+<script type="application/ld+json"></script>
 
 {% schema %}
 {
@@ -146,7 +146,7 @@
       "label": "t:sections.all.colors.label",
       "default": "background-1"
     },
-      {
+    {
       "type": "color_scheme",
       "id": "menu_color_scheme",
       "label": "t:sections.header.settings.menu_color_scheme.label",

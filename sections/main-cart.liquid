@@ -1,5 +1,161 @@
+{{ 'section-main-cart.css' | asset_url | stylesheet_tag }}
+
 <div class="cart">
-    <div class="cart__container container">
-        test text for cart!
+  <div class="container">
+    <div class="cart__wrapper cart">
+      {%- unless cart.empty? -%}
+        {% comment %} <form action="{{ routes.cart_url }}" class="cart__contents critical-hidden" method="post" id="cart"></form> {% endcomment %}
+        {% form 'cart', cart, id: 'cart' %}
+          {% for item in cart.items %}
+            <div class="cart__item" id="CartItem-{{ item.index | plus: 1 }}">
+              <span class="item_test_value" style="display: none;">{{ item.title }}</span>
+              {% comment %} image {% endcomment %}
+              {%- if item.image -%}
+                {{ item.image | image_url: width: 400 | image_tag }}
+              {%- endif -%}
+              {% comment %} image {% endcomment %}
+
+              {% comment %} title {% endcomment %}
+              <h4>
+                <a href="{{ item.url }}">{{ item.product.title | escape }}</a>
+              </h4>
+              {% comment %} title {% endcomment %}
+
+              {% comment %} vendor {% endcomment %}
+              <p>{{ item.product.vendor }}</p>
+              {% comment %} vendor {% endcomment %}
+
+              {% comment %} price and Line item discounts using item instead of line_item {% endcomment %}
+              <div class="cart__price cart-price">
+                {%- if item.original_price > item.final_price -%}
+                  <s class="cart-price__final-price">{{ item.original_price | money }}</s>
+                {%- endif -%}
+                <span class="cart-price__original-price">{{ item.final_price | money }}</span>
+              </div>
+
+              {% comment %} Discounts {% endcomment %}
+              {%- if item.line_level_discount_allocations.size > 0 -%}
+                <p class="cart-price__discounts discounts">Discounts:</p>
+                <ul class="discounts__list">
+                  {%- for discount_allocation in item.line_level_discount_allocations -%}
+                    <li class="discounts__item">
+                      {{ discount_allocation.discount_application.title }}-{{ discount_allocation.amount | money }}
+                    </li>
+                  {%- endfor -%}
+                </ul>
+              {%- endif -%}
+              {% comment %} price {% endcomment %}
+
+              {% comment %} options {% endcomment %}
+              <div class="cart__options cart-options">
+                {%- if item.product.has_only_default_variant == false -%}
+                  {%- for option in item.options_with_values -%}
+                    <span class="cart-options__name">{{ option.name }}:</span>
+                    <span class="cart-options__value">{{ option.value }}</span>
+                  {%- endfor -%}
+                {%- endif -%}
+              </div>
+              {% comment %} options {% endcomment %}
+
+              {% comment %} item properties {% endcomment %}
+              <div class="cart__properties cart-properties">
+                {%- unless item.properties == empty -%}
+                  {%- for property in item.properties -%}
+                    {%- assign property_first_char = property.first | slice: 0 -%}
+                    {%- if property.last != blank and property_first_char != '_' -%}
+                      <span class="cart-properties__property">{{ property.first }}:</span>
+                      {%- if property.last contains '/uploads/' -%}
+                        <a class="cart-properties__link" href="{{ property.last }}" target="_blank">
+                          {{ property.last | split: '/' | last }}
+                        </a>
+                      {%- else -%}
+                        <span class="cart-properties__text">{{ property.last }}</span>
+                      {%- endif -%}
+                    {%- endif -%}
+                  {%- endfor -%}
+                {%- endunless -%}
+              </div>
+              {% comment %} item properties {% endcomment %}
+
+              {% comment %} quantity {% endcomment %}
+              <div class="cart__quantity cart-quantity">
+                {% comment %} {% form 'cart', cart %} {% endcomment %}
+                <!-- form content -->
+                <input class="cart-quantity__update" type="number" name="updates[]" value="{{ item.quantity }}">
+                {% comment %} Update line item quantities {% endcomment %}
+                <input class="cart-quantity__submit" type="submit" value="Update cart">
+                {% comment %} Submitting the form {% endcomment %}
+                {% comment %} {% endform %} {% endcomment %}
+
+                {% comment %} Remove line items from the cart {% endcomment %}
+                <a class="cart-quantity__remove" href="{{ item.url_to_remove }}">Remove</a>
+                {% comment %} Remove line items from the cart {% endcomment %}
+              </div>
+              {% comment %} quantity {% endcomment %}
+
+              <div class="cart__additional cart-additional">
+                {% comment %} Cart notes {% endcomment %}
+                <div class="cart-additional__note">
+                  <label for="note">Gift note:</label>
+                  <textarea
+                    id="note"
+                    data-note="{{ cart.note }}"
+                    class="cart-additional__note"
+                    name="note"
+                    form="cart"
+                  >{{ cart.note }}</textarea>
+                </div>
+                {% comment %} Cart notes {% endcomment %}
+
+                {% comment %} Cart attributes {% endcomment %}
+                <div class="cart-additional__attributes">
+                  <label for="attributes">What do you want engraved on your cauldron?</label>
+                  <input
+                    id="attributes"
+                    type="text"
+                    name="attributes[cauldron-engraving]"
+                    value="{{ cart.attributes.cauldron-engraving }}"
+                  >
+                </div>
+                {% comment %} Cart attributes {% endcomment %}
+              </div>
+
+              <div class="cart__footer cart-footer">
+                {% comment %} Cart discounts {% endcomment %}
+                <p class="cart-footer__discounts discounts">Subtotal: {{ cart.items_subtotal_price | money }}</p>
+
+                {%- if cart.cart_level_discount_applications.size > 0 -%}
+                  <p class="discounts__title">Discounts:</p>
+                  <ul class="discounts__list">
+                    {%- for discount_application in cart.cart_level_discount_applications -%}
+                      <li class="discounts__item">
+                        {{ discount_application.title }}-{{ discount_application.total_allocated_amount | money }}
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+                {%- endif -%}
+                {% comment %} Cart discounts {% endcomment %}
+                <div class="cart-footer__total-price">
+                  <p>Estimated total: {{ cart.total_price | money }}</p>
+                </div>
+
+                <input
+                  class="cart-footer__checkout"
+                  type="submit"
+                  name="checkout"
+                  value="Checkout"
+                  {% if cart == empty %}
+                    disabled
+                  {% endif %}
+                >
+              </div>
+            </div>
+          {% endfor %}
+        {% endform %}
+      {%- else -%}
+        <h2>Your cart is empty</h2>
+        <a href="{{ routes.all_products_collection_url }}">Continue shopping </a>
+      {%- endunless -%}
     </div>
+  </div>
 </div>

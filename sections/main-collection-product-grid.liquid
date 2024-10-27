@@ -1,0 +1,100 @@
+{{ 'template-collection.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+<section class="collection section-{{ section.id }}-padding gradient color-{{ section.settings.color_scheme }}">
+  <div class="collection__container container">
+    {% paginate collection.products by 6 %}
+      {% render 'sorting', collection: collection %}
+
+      <div
+        class="
+          collection__grid grid
+          grid-{{ section.settings.columns_mobile }}__col-mobile
+          grid-{{ section.settings.columns_tablet }}__col-tablet
+          grid-{{ section.settings.columns_desktop }}__col-desktop
+        "
+      >
+        {%- for product in collection.products -%}
+          <div class="grid__item">
+            {% render 'product-card', product: product %}
+          </div>
+        {%- endfor -%}
+      </div>
+
+      {% render 'pagination', paginate: paginate %}
+    {% endpaginate %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "t:sections.main-collection-product-grid.name",
+  "settings": [
+    {
+      "type": "select",
+      "id": "columns_desktop",
+      "default": "4",
+      "label": "Columns desktop",
+      "options": [
+        {
+          "value": "4",
+          "label": "4 columns"
+        },
+        {
+          "value": "5",
+          "label": "5 columns"
+        },
+        {
+          "value": "6",
+          "label": "6 columns"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "columns_tablet",
+      "default": "3",
+      "label": "Columns tablet",
+      "options": [
+        {
+          "value": "3",
+          "label": "3 columns"
+        },
+        {
+          "value": "2",
+          "label": "2 columns"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "default": "2",
+      "label": "Columns mobile",
+      "options": [
+        {
+          "value": "2",
+          "label": "2 columns"
+        },
+        {
+          "value": "1",
+          "label": "1 columns"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

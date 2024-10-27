@@ -16,7 +16,7 @@
     <ul class="featured-collection__list">
       {% for product in collection.products limit: product_limit %}
         <li class="featured-collection__item">
-            {% render 'product-card', product: product, show_vendor: false %}
+          {% render 'product-card', product: product, show_vendor: section.settings.show_vendor, accelerated_checkout_button: section.settings.accelerated_checkout_button %}
         </li>
       {% endfor %}
     </ul>
@@ -27,26 +27,38 @@
 {
   "name": "featured Collection",
   "settings": [
-      {
-        "type": "text",
-        "id": "title",
-        "label": "Title",
-        "default": "Featured collection"
-      },
-      {
-        "type": "collection",
-        "id": "collection",
-        "label": "Collection"
-      },
-      {
-        "type": "range",
-        "id": "product_limit",
-        "min": 2,
-        "max": 12,
-        "step": 1,
-        "default": 4,
-        "label": "Maximum products to show"
-      }
-    ]
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Featured collection"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "product_limit",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "default": 4,
+      "label": "Maximum products to show"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "default": false,
+      "label": "Show vendor"
+    },
+    {
+      "type": "checkbox",
+      "id": "accelerated_checkout_button",
+      "default": false,
+      "label": "Show accelerated checkout button"
+    }
+  ]
 }
 {% endschema %}

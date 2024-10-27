@@ -1,7 +1,7 @@
 .container {
-    max-width: var(--page-width);
-    margin: 0 auto;
-    padding: 0 1.5rem;
+  max-width: var(--page-width);
+  margin: 0 auto;
+  padding: 0 1.5rem;
 }
 
 h1,
@@ -30,6 +30,7 @@ h1,
 }
 
 @media only screen and (min-width: 750px) {
+
   h1,
   .h1 {
     font-size: calc(var(--font-heading-scale) * 4rem);
@@ -42,6 +43,7 @@ h2,
 }
 
 @media only screen and (min-width: 750px) {
+
   h2,
   .h2 {
     font-size: calc(var(--font-heading-scale) * 2.4rem);
@@ -54,6 +56,7 @@ h3,
 }
 
 @media only screen and (min-width: 750px) {
+
   h3,
   .h3 {
     font-size: calc(var(--font-heading-scale) * 1.8rem);
@@ -73,6 +76,7 @@ h5,
 }
 
 @media only screen and (min-width: 750px) {
+
   h5,
   .h5 {
     font-size: calc(var(--font-heading-scale) * 1.3rem);
@@ -92,12 +96,12 @@ h6,
 }
 
 .no-top-margin {
-    margin-top: 0;
+  margin-top: 0;
 }
 
 img {
-    max-width: 100%;
-    height: auto;
+  max-width: 100%;
+  height: auto;
 }
 
 .visually-hidden {
@@ -107,7 +111,7 @@ img {
   margin: -1px;
   border: 0;
   padding: 0;
-  
+
   white-space: nowrap;
   clip-path: inset(100%);
   clip: rect(0 0 0 0);

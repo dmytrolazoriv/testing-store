@@ -1,0 +1,89 @@
+{% liquid
+  assign media_count = product.media.size
+  if media_count > 1 and variant_images.size > 0
+    assign media_count = media_count | minus: variant_images.size | plus: 1
+  endif
+%}
+
+{% if is_main %}
+  <!-- Main product image section -->
+  {% if featured_media %}
+    {% case featured_media.media_type %}
+      {% when 'image' %}
+        <div
+          class="product-single__media"
+          style="padding-top: {{ 1 | divided_by: featured_media.aspect_ratio | times: 0 }}%;"
+          data-media-id="{{ featured_media.id }}"
+        >
+          {{ featured_media | image_url: width: 512 | image_tag }}
+        </div>
+      {% when 'external_video' %}
+        <div
+          class="product-single__media"
+          style="padding-top: {{ 1 | divided_by: featured_media.aspect_ratio | times: 100 }}%;"
+          data-media-id="{{ featured_media.id }}"
+        >
+          {{ featured_media | external_video_tag }}
+        </div>
+      {% when 'video' %}
+        <div class="product-single__media" data-media-id="{{ featured_media.id }}">
+          {{ featured_media | video_tag: controls: true }}
+        </div>
+      {% when 'model' %}
+        <div
+          class="product-single__media"
+          style="padding-top: 100%"
+          data-media-id="{{ featured_media.id }}"
+        >
+          {{ featured_media | model_viewer_tag }}
+        </div>
+      {% else %}
+        <div
+          class="product-single__media"
+          style="padding-top: 100%;"
+          data-media-id="{{ featured_media.id }}"
+        >
+          {{ featured_media | media_tag }}
+        </div>
+    {% endcase %}
+  {% else %}
+    <!-- Fallback for media -->
+    {% if media %}
+      {% case media.media_type %}
+        {% when 'image' %}
+          <div
+            class="product-single__media"
+            style="padding-top: {{ 1 | divided_by: media.aspect_ratio | times: 0 }}%;"
+            data-media-id="{{ media.id }}"
+          >
+            {{ media | image_url: width: 512, height: 512 | image_tag }}
+          </div>
+        {% when 'external_video' %}
+          <div
+            class="product-single__media"
+            style="padding-top: {{ 1 | divided_by: media.aspect_ratio | times: 100 }}%;"
+            data-media-id="{{ media.id }}"
+          >
+            {{ media | external_video_tag }}
+          </div>
+        {% when 'video' %}
+          <div class="product-single__media" data-media-id="{{ media.id }}">
+            {{ media | video_tag: controls: true }}
+          </div>
+        {% when 'model' %}
+          <div class="product-single__media" style="padding-top: 100%" data-media-id="{{ media.id }}">
+            {{ media | model_viewer_tag }}
+          </div>
+        {% else %}
+          <div class="product-single__media" style="padding-top: 100%;" data-media-id="{{ media.id }}">
+            {{ media | media_tag }}
+          </div>
+      {% endcase %}
+    {% endif %}
+  {% endif %}
+{% endif %}
+
+<!-- Render thumbnails only if the media isn't the featured media to avoid duplication -->
+{% if media.id == featured_media.id %}
+  {% render 'product-thumbnail' %}
+{% endif %}
